@@ -6,6 +6,11 @@ pipeline {
     }
 
     stages {
+         stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/govindh369/micro-product-go.git'
+            }
+        }
         stage("unit-test") {
             steps {
                 echo 'UNIT TEST EXECUTION STARTED'
