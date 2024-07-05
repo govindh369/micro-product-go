@@ -1,14 +1,8 @@
 pipeline {
-
     agent any
 
     tools {
         go 'go1.14'
-    }
-    environment {
-        GO114MODULE = 'on'
-        CGO_ENABLED = 0 
-        GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
 
     stages {
@@ -29,16 +23,12 @@ pipeline {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t shadowshotx/product-go-micro'
+                sh 'go build -o build/output.exe ./main.go' // Adjust the output path and main file as needed
             }
         }
-        stage('Docker Push') {
-            agent any
+        stage('Archive Artifact') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerhubPassword', usernameVariable: 'dockerhubUser')]) {
-                sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPassword}"
-                sh 'docker push shadowshotx/product-go-micro'
-                }
+                archiveArtifacts artifacts: 'build/output.exe', allowEmptyArchive: true
             }
         }
     }
